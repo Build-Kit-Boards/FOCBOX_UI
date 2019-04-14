@@ -1,3 +1,7 @@
+=== FW 23.43 ===
+* Reverted change to R/L detection to fix some bad motor ID problems
+* Added updates to serial driver and packet format
+
 === FW 23.42 ===
 * Adjusted default motor thermal settings to improve performance of raptor 2.1
 * Slight alteration to low speed braking algorithm for smoother braking. May notice a very subtle chatter sound at low speed which is normal and safe.

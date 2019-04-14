@@ -551,7 +551,7 @@ Item {
             if(batterySwitch.checked)
                 batteryText.text = parseFloat(batteryGauge.value).toFixed(0) + " %"
             else
-                batteryText.text = parseFloat(values.v_in).toFixed(0) + " V"
+                batteryText.text = parseFloat(values.v_in).toFixed(1) + " V"
 
             if(speedSwitch.checked){
                 rpmGauge.value = Math.min(values.rpm,values.rpm2)/rpmconv.realValue*60*mmDiameter.value/1000.0*3.14*0.000621371 //to mph

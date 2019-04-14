@@ -33,6 +33,7 @@ ApplicationWindow {
     property ConfigParams mAppConf: VescIf.appConfig()
     property ConfigParams mInfoConf: VescIf.infoConfig()
     property real currentSetupStep: 0
+    property real rtDataRequestCtr: 0
     visible: true
     width: 600
     height: 1000
@@ -439,10 +440,32 @@ ApplicationWindow {
             if (VescIf.isPortConnected() && (tabBar.currentIndex == 1 ) && confPageBattery.configNotUpdating) {
                 // Sample RT data when the RT page is selected
                 mCommands.getValues()
+                rtDataRequestCtr = rtDataRequestCtr + 1
+                if(rtDataRequestCtr>10){
+                    rtTimer.running = false
+                    blePauseTimer.running = true
+                }
             }
             if (VescIf.isPortConnected() && tabBar.currentIndex == 2 && confPageBattery.configNotUpdating) {
                 mCommands.getDecodedPpm()
+                rtDataRequestCtr = rtDataRequestCtr + 1
+                if(rtDataRequestCtr>10){
+                    rtTimer.running = false
+                    blePauseTimer.running = true
+                }
             }
+        }
+    }
+
+    Timer {
+        id: blePauseTimer
+        interval: 1500
+        running: false
+        repeat: false
+
+        onTriggered: {
+           rtDataRequestCtr = 0
+           rtTimer.running = true
         }
     }
 
@@ -687,7 +710,17 @@ ApplicationWindow {
 
 
     Connections {
+
         target: mCommands
+        onDecodedPpmReceived: {
+            rtDataRequestCtr = 0
+
+        }
+        onValuesReceived: {
+            rtDataRequestCtr = 0
+
+        }
+
         onMotorLinkageReceived: {
             setupGuideOK.enabled = true
         }

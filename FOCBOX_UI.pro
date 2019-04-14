@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 # Version
-VT_VERSION = 1.1
+VT_VERSION = 1.2
 VT_INTRO_VERSION = 1
 
 DEFINES += VT_VERSION=$$VT_VERSION
@@ -21,8 +21,14 @@ CONFIG += build_original
 # CONFIG += build_bronze
 #CONFIG += build_free
 
+CONFIG += c++11
+
+
+# Bluetooth available
+DEFINES += HAS_BLUETOOTH
+
 # Build mobile GUI
-CONFIG += build_mobile
+# CONFIG += build_mobile
 
 CONFIG += qtquickcompiler
 
@@ -30,14 +36,21 @@ QT       += core gui
 QT       += widgets
 QT       += printsupport
 QT       += network
-QT       += bluetooth
 QT       += quick
 QT       += quickcontrols2
 QT       += charts qml
 
 #QT       += positioning
 
-DEFINES += HAS_SERIALPORT
+!android: {
+    # Serial port available
+    DEFINES += HAS_SERIALPORT
+}
+
+contains(DEFINES, HAS_BLUETOOTH) {
+    QT       += bluetooth
+}
+
 contains(DEFINES, HAS_SERIALPORT) {
     QT       += serialport
 }
@@ -93,7 +106,6 @@ SOURCES += main.cpp\
     setupwizardapp.cpp \
     setupwizardmotor.cpp \
     startupwizard.cpp \
-    bleuart.cpp \
     utility.cpp
 
 HEADERS  += mainwindow.h \
@@ -109,13 +121,17 @@ HEADERS  += mainwindow.h \
     setupwizardapp.h \
     setupwizardmotor.h \
     startupwizard.h \
-    bleuart.h \
     utility.h
 
 FORMS    += mainwindow.ui \
     parametereditor.ui \
     mainwindow.ui \
     parametereditor.ui
+
+contains(DEFINES, HAS_BLUETOOTH) {
+    SOURCES += bleuart.cpp
+    HEADERS += bleuart.h
+}
 
 include(pages/pages.pri)
 include(widgets/widgets.pri)

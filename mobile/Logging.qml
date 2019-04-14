@@ -30,7 +30,7 @@
 import QtQuick 2.7
 import QtQuick.Layouts 1.3
 import QtQuick 2.0
-import QtCharts 2.2
+//import QtCharts 2.2
 import QtQuick.Window 2.11
 //import QuickPlot 1.0
 
@@ -172,7 +172,7 @@ Item {
                     axisY: axisY1
                     useOpenGL: chartView.openGL
                 }
-            }*/
+            }
 
             ChartView {
                 Layout.fillWidth: true

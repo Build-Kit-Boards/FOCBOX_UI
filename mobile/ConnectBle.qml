@@ -119,5 +119,8 @@ ConnectBleForm {
 
             bleBox.currentIndex = 0
         }
+        onBleError: {
+            VescIf.emitMessageDialog("BLE Error", info, false, false)
+        }
     }
 }

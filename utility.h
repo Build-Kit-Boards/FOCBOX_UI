@@ -21,6 +21,8 @@
 #define UTILITY_H
 
 #include <QObject>
+#include <QMetaEnum>
+#include <cstdint>
 #include "vescinterface.h"
 
 class Utility : public QObject
@@ -39,6 +41,12 @@ public:
     Q_INVOKABLE static QString aboutText();
     Q_INVOKABLE static QString uuid2Str(QByteArray uuid, bool space);
     Q_INVOKABLE static bool requestFilePermission();
+    static uint32_t crc32c(uint8_t *data, uint32_t len);
+
+    template<typename QEnum>
+       static QString QEnumToQString (const QEnum value) {
+           return QString(QMetaEnum::fromType<QEnum>().valueToKey(value));
+       }
 
 signals:
 

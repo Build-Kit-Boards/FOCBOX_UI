@@ -71,6 +71,8 @@ Item{
     property double kp: 0.0
     property double ki: 0.0
     property double gain: 0.0
+    property double openloop_rpm: 500 //foc_openloop_rpm
+    property double sensorless_rpm: 3500 //foc_sl_erpm
 
     property double res2: 0.0
     property double ind2: 0.0
@@ -97,12 +99,12 @@ Item{
     property double maxBrakeCurrent2: 0.0
 
     property double msMin: 1.0
-    property double msMax: 1.5
-    property double msCenter: 2.0
+    property double msMax: 2.0
+    property double msCenter: 1.5
 
     property double msMinTest: 1.0
-    property double msMaxTest: 1.5
-    property double msCenterTest: 2.0
+    property double msMaxTest: 2.0
+    property double msCenterTest: 1.5
 
     property double msNow: 1.5
 
@@ -124,6 +126,11 @@ Item{
     property double motorTemp: 135
     property bool motorTempEnable: true
     property double motorBeta: 4100
+
+    property double maxErpmDiff: 3000
+    property bool tcEnable: true
+    property double posRampTime: 0.3
+    property double negRampTime: 0.1
 
     property Commands mCommands: VescIf.commands()
     property ConfigParams mAppConf: VescIf.appConfig()
@@ -187,6 +194,7 @@ Item{
             return;
         }
         gain = 0.001 / (lambda * lambda)*1e6
+
     }
     function calcGain2() {
         if (lambda2 < 1e-10) {
@@ -196,14 +204,26 @@ Item{
             return;
         }
         gain2 = 0.001 / (lambda2 * lambda2)*1e6
+        if(lambda >0.0001 && lambda2 > 0.0001){
+            var lambda_min = Math.min(lambda,lambda2)
+            openloop_rpm = Math.round(500.0*0.006/lambda_min/10.0)*10.0
+            sensorless_rpm = Math.round(3500.0*0.006/lambda_min/10.0)*10.0
+        }
     }
     function updateDisplay() {
         txtMinTest.text = "Min: " + parseFloat(msMinTest).toFixed(2) + " ms"
         txtNowTest.text = "Now: " + parseFloat(msNow).toFixed(2) + " ms"
+        txtCenterTest.text = "Center: " + parseFloat(msCenterTest).toFixed(2) + " ms"
         txtMaxTest.text = "Max: " + parseFloat(msMaxTest).toFixed(2) + " ms"
+        if(msNow<msCenter)
+            valueBar.value = (msNow - msCenter)/(msCenter - msMin)
+        else
+            valueBar.value = (msNow - msCenter)/(msMax - msCenter)
         txtNow.text = parseFloat(valueBar.value*100).toFixed(0) + "%"
-        valueBar.value = (msNow - (msMax + msMin)/2.0)/((msMax + msMin)/2.0 - msMin)
-        valueBarTest.value = (msNow - (msMaxTest + msMinTest)/2.0)/((msMaxTest + msMinTest)/2.0 - msMinTest)
+        if(msNow<msCenterTest)
+            valueBarTest.value = (msNow - msCenterTest)/(msCenterTest - msMinTest)
+        else
+            valueBarTest.value = (msNow - msCenterTest)/(msMaxTest - msCenterTest)
     }
     function updateGraphics() {
 
@@ -292,6 +312,10 @@ Item{
 
         mMcConf.updateParamDouble("foc_motor_r", res, item1);
         mMcConf.updateParamDouble("foc_motor_r2", res2, item1);
+
+        mMcConf.updateParamDouble("foc_openloop_rpm", openloop_rpm, item1);
+        mMcConf.updateParamDouble("foc_sl_erpm", sensorless_rpm, item1);
+
         mMcConf.updateParamDouble("foc_motor_l", ind, item1);
         mMcConf.updateParamDouble("foc_motor_l2", ind2, item1);
         console.log("kp is right before", kp)
@@ -371,7 +395,12 @@ Item{
             break;
         }
 
-        mAppConf.updateParamBool("app_ppm_conf.tc", false);
+        mAppConf.updateParamBool("app_ppm_conf.tc", tcEnable);
+        mAppConf.updateParamDouble("app_ppm_conf.tc_max_diff", maxErpmDiff)
+        mAppConf.updateParamDouble("app_ppm_conf.ramp_time_pos", posRampTime)
+        mAppConf.updateParamDouble("app_ppm_conf.ramp_time_neg", negRampTime)
+
+
         mAppConf.updateParamBool("app_ppm_conf.median_filter", true);
         mAppConf.updateParamBool("app_ppm_conf.safe_start", true);
         mAppConf.updateParamEnum("can_baud_rate", 2);
@@ -2319,7 +2348,7 @@ Item{
 
                         Button{
                             Layout.preferredWidth: uartBaudComboBox.width
-                            text: "Tune Throttle Curves"
+                            text: "Advanced Throttle Config"
                             //font.bold: true
                             font.pixelSize: uibox.textSize1
                             onClicked: {
@@ -3062,6 +3091,20 @@ Item{
             torqueCurveBrake = mAppConf.getParamDouble("app_ppm_conf.throttle_exp_brake")
             deadZone = mAppConf.getParamDouble("app_ppm_conf.hyst")
 
+            tcEnable = mAppConf.getParamBool("app_ppm_conf.tc")
+            maxErpmDiff = mAppConf.getParamDouble("app_ppm_conf.tc_max_diff")
+            posRampTime = mAppConf.getParamDouble("app_ppm_conf.ramp_time_pos")
+            negRampTime = mAppConf.getParamDouble("app_ppm_conf.ramp_time_neg")
+
+            posRampSlider.value = posRampTime
+            negRampSlider.value = negRampTime*2.0
+            maxErpmSlider.value = (maxErpmDiff - 1000.0)/4000.0
+            if(tcEnable){
+                tcEnableComboBox.currentIndex = 1
+            }else{
+                tcEnableComboBox.currentIndex = 0
+            }
+
             secondsToOff = mAppConf.getParamInt("app_smart_switch_conf.msec_pressed_for_off")/1000.0
             minutesToOff = Math.round(mAppConf.getParamInt("app_smart_switch_conf.sec_inactive_for_off")/60.0)
             pushToStart = mAppConf.getParamBool("app_smart_switch_conf.push_to_start_enabled")
@@ -3182,6 +3225,9 @@ Item{
             motorBeta = mMcConf.getParamDouble("m_ntc_motor_beta")
             motorTempEnable = mMcConf.getParamBool("m_motor_temp_throttle_enable")
 
+            openloop_rpm =  mMcConf.getParamDouble("foc_openloop_rpm")
+            sensorless_rpm =  mMcConf.getParamDouble("foc_sl_erpm")
+
 
 
 
@@ -3262,7 +3308,7 @@ Item{
             if (pos > (range / 4.0) && pos < ((3.0 * range) / 4.0)) {
                 msCenterTest = msNow
             } else {
-                msCenterTest = range / 2.0 + msMin
+                msCenterTest = range / 2.0 + msMinTest
             }
 
             updateDisplay()
@@ -3422,6 +3468,10 @@ Item{
 
         x: (parent.width - width) / 2
         y: (parent.height - height) / 2
+        onClosed: {
+            calibrationButton.enabled = true;
+        }
+
         ColumnLayout{
             id:remoteDialogBody
             anchors.fill:parent
@@ -3430,11 +3480,19 @@ Item{
                 id: instructions
                 Layout.fillWidth: true
                 wrapMode: Text.WordWrap
-                text: "Press the throttle of your remote fully forward and backward to calibrate the maximum limits then hit APPLY."
+                text: "Press the throttle of your remote fully forward and backward to calibrate the maximum limits, then release the throttle to the neutral position and hit APPLY."
             }
             RowLayout{
                 Layout.fillWidth:  true
                 ColumnLayout{
+                    Text{
+                        id: txtNowTest
+                        text: "1.5 ms"
+                        Layout.alignment: Qt.AlignCenter
+                        Layout.fillWidth: true
+                        horizontalAlignment: Text.AlignHCenter
+                        font.pixelSize: uibox.textSize1
+                    }
                     ProgressBar {
                         id: valueBarTest
                         Layout.fillWidth: true
@@ -3456,13 +3514,14 @@ Item{
                             font.pixelSize: uibox.textSize1
                         }
                         Text{
-                            id: txtNowTest
+                            id: txtCenterTest
                             text: "1.5 ms"
                             Layout.alignment: Qt.AlignCenter
                             Layout.fillWidth: true
                             horizontalAlignment: Text.AlignHCenter
                             font.pixelSize: uibox.textSize1
                         }
+
                         Text{
                             id: txtMaxTest
                             text: "2.0 ms"
@@ -3527,9 +3586,9 @@ Item{
         id: remoteDialog2
         modal: true
         focus: true
-        width: parent.width - 8
+        width: Math.min(parent.width - 8,parent.height*0.5)
         closePolicy: Popup.CloseOnEscape
-        //  title:"Throttle Curve Setup"
+        title:"ADVANCED THROTTLE CONFIG:"
 
 
         x: (parent.width - width) / 2
@@ -3585,9 +3644,10 @@ Item{
                             id: axisY2
                             min: -100
                             labelFormat: "%.0f\%"
-                            labelsFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio
+                            labelsFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio*0.6
+                            titleFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio*0.6
                             max: 100
-                            // titleText: "Motor Command"
+                            titleText: "Motor Command"
                         }
 
 
@@ -3596,8 +3656,9 @@ Item{
                             min: -100
                             max: 100
                             labelFormat: "%.0f\%"
-                            labelsFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio
-                            // titleText: "Remote Input"
+                            labelsFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio*0.6
+                            titleFont.pixelSize: uibox.textSize1*Screen.devicePixelRatio*0.6
+                            titleText: "Remote Input"
                             //  labelsColor: "#00000000"
                         }
 
@@ -3682,6 +3743,186 @@ Item{
                     // Layout.alignment: Qt.AlignRight
                     Layout.preferredWidth: parent.width/5
                 }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:posRampTitle
+                    text:"Positive Throttle Ramping Time:"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:posRampText
+                    text:"0.3 s"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: posRampSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0.3
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        posRampTime = value
+
+                        posRampText.text = parseFloat(posRampTime).toFixed(2) + " s"
+
+                    }
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:negRampTitle
+                    text:"Negative Throttle Ramping Time:"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:negRampText
+                    text:"0.1 s"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: negRampSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0.2
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        negRampTime = value/2.0
+                        negRampText.text = parseFloat(negRampTime).toFixed(2) + " s"
+
+                    }
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:tcEnableText
+                    text:"Traction CTRL: "
+                    font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/2
+                }
+
+                ComboBox {
+                    id: tcEnableComboBox
+                    Layout.fillWidth: true
+                    //  Layout.preferredHeight:  0.6*uibox.middleColumnWidth1
+                    // Layout.preferredWidth: parent.width/2
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    font.pixelSize: uibox.textSize1
+                    currentIndex: 1
+
+                    model: [
+                        "Disabled",
+                        "Enabled"
+                    ]
+
+                    onCurrentIndexChanged: {
+                        if(currentIndex === 1)
+                            tcEnable = true
+                        else
+                            tcEnable = false
+                        if(tcEnable){
+                            maxErpmTitle.opacity = 1
+                            maxErpmText.opacity = 1
+                            maxErpmSlider.opacity = 1
+                        }else
+                        {
+                            maxErpmTitle.opacity = 0.5
+                            maxErpmText.opacity = 0.5
+                            maxErpmSlider.opacity = 0.5
+                        }
+
+                        maxErpmTitle.enabled = tcEnable
+                        maxErpmText.enabled = tcEnable
+                        maxErpmSlider.enabled = tcEnable
+                    }
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:maxErpmTitle
+                    text:"Traction CTRL Max eRPM Difference :"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:maxErpmText
+                    text:"3000 ERPM"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: maxErpmSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0.4
+                    stepSize: 0.01
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        maxErpmDiff = value*4000 + 1000
+                        maxErpmText.text = parseFloat(maxErpmDiff).toFixed(0) + " eRPM"
+
+                    }
+                }
+
+
+
+
+
+
             }
 
             RowLayout{

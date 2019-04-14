@@ -211,7 +211,7 @@ bool Utility::requestFilePermission()
     // https://codereview.qt-project.org/#/c/199162/
     QtAndroid::PermissionResult r = QtAndroid::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE");
     if(r == QtAndroid::PermissionResult::Denied) {
-       QtAndroid::requestPermissionsSync( QStringList() << "android.permission.WRITE_EXTERNAL_STORAGE" );
+        QtAndroid::requestPermissionsSync( QStringList() << "android.permission.WRITE_EXTERNAL_STORAGE" );
         r = QtAndroid::checkPermission("android.permission.WRITE_EXTERNAL_STORAGE");       if(r == QtAndroid::PermissionResult::Denied) {
             return false;
         }
@@ -220,4 +220,21 @@ bool Utility::requestFilePermission()
 #else
     return true;
 #endif
+}
+
+uint32_t Utility::crc32c(uint8_t *data, uint32_t len)
+{
+    uint32_t crc = 0xFFFFFFFF;
+
+    for (uint32_t i = 0; i < len;i++) {
+        uint32_t byte = data[i];
+        crc = crc ^ byte;
+
+        for (int j = 7;j >= 0;j--) {
+            uint32_t mask = -(crc & 1);
+            crc = (crc >> 1) ^ (0x82F63B78 & mask);
+        }
+    }
+
+    return ~crc;
 }

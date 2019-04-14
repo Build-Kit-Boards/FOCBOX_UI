@@ -43,4 +43,12 @@
 *New Unity FW
 *Motor Temp Config Refined
 
+=== 1.2 ===
+*Support for firmware 23.43, including improved motor calibration, shutdown over CAN bus for multi-esc, Traction Control, and Improved communication interface
+*Improved BLE reliability
+*Ramping time customization added to advanced remote menu
+*Traction control settings added to advanced customization menu
+*Added decimal place to the battery voltage reading
+*Labeled axes for torque curves
+
 

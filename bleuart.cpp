@@ -18,6 +18,7 @@
     */
 
 #include "bleuart.h"
+#include "utility.h"
 
 #include <QDebug>
 #include <QLowEnergyConnectionParameters>
@@ -35,6 +36,7 @@ BleUart::BleUart(QObject *parent) : QObject(parent)
     mServiceUuidtry2 = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
     mRxUuidtry2 = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
     mTxUuidtry2 = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+
     mDeviceDiscoveryAgent = new QBluetoothDeviceDiscoveryAgent(this);
 
     connect(mDeviceDiscoveryAgent, SIGNAL(deviceDiscovered(const QBluetoothDeviceInfo&)),
@@ -57,8 +59,17 @@ void BleUart::startConnect(QString addr)
     mUartServiceFound = false;
     mConnectDone = false;
 
+#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+    // Create BT Controller from unique device UUID stored as addr. Creating
+    // a controller using a devices address is not supported on macOS or iOS.
+    QBluetoothDeviceInfo deviceInfo = QBluetoothDeviceInfo();
+    deviceInfo.setDeviceUuid(QBluetoothUuid(addr));
+    mControl = new QLowEnergyController(deviceInfo);
+
+#else
     mControl = new QLowEnergyController(QBluetoothAddress(addr));
 
+#endif
     mControl->setRemoteAddressType(QLowEnergyController::RandomAddress);
 
     connect(mControl, SIGNAL(serviceDiscovered(QBluetoothUuid)),
@@ -81,7 +92,7 @@ void BleUart::startConnect(QString addr)
 
 void BleUart::refreshDevice()
 {
-   // qDebug() << "BLE device connected";
+    // qDebug() << "BLE device connected";
     mService->discoverDetails();
     //mControl->requestConnectionUpdate(mService);
 }
@@ -90,13 +101,13 @@ void BleUart::refreshDevice()
 void BleUart::disconnectBle()
 {
     if (mService) {
-        delete mService;
+        mService->deleteLater();
         mService = 0;
     }
 
     if (mControl) {
         mControl->disconnectFromDevice();
-        delete mControl;
+        mService->deleteLater();
         mControl = 0;
     }
 }
@@ -133,8 +144,14 @@ void BleUart::addDevice(const QBluetoothDeviceInfo &dev)
     if (dev.coreConfigurations() & QBluetoothDeviceInfo::LowEnergyCoreConfiguration) {
         qDebug() << "BLE scan found device:" << dev.name();
 
-        mDevs.insert(dev.name(), dev.address().toString());
+#if defined(Q_OS_MACOS) || defined(Q_OS_IOS)
+        // macOS and iOS do not expose the hardware address of BLTE devices, must use
+        // the OS generated UUID.
+        mDevs.insert(dev.name(), dev.deviceUuid().toString());
+#else
+        mDevs.insert(dev.name(),dev.address().toString());
 
+#endif
         emit scanDone(mDevs, false);
     }
 }
@@ -151,6 +168,8 @@ void BleUart::deviceScanError(QBluetoothDeviceDiscoveryAgent::Error e)
 
     mDevs.clear();
     emit scanDone(mDevs, true);
+    emit bleError(tr("BLE Scan error: ") + Utility::QEnumToQString(e));
+
 }
 
 void BleUart::serviceDiscovered(const QBluetoothUuid &gatt)
@@ -174,7 +193,7 @@ void BleUart::serviceDiscovered(const QBluetoothUuid &gatt)
 void BleUart::serviceScanDone()
 {
     if (mService) {
-        delete mService;
+        mService->deleteLater();
         mService = 0;
     }
 
@@ -199,6 +218,8 @@ void BleUart::serviceScanDone()
 void BleUart::controllerError(QLowEnergyController::Error e)
 {
     qWarning() << "BLE error:" << e;
+    disconnectBle();
+    emit bleError(tr("BLE error: ") + Utility::QEnumToQString(e));
 }
 
 void BleUart::deviceConnected()
@@ -269,6 +290,7 @@ void BleUart::confirmedDescriptorWrite(const QLowEnergyDescriptor &d, const QByt
         disconnectBle();
     } else {
         mConnectDone = true;
+        emit connected();
     }
 }
 
@@ -276,15 +298,15 @@ void BleUart::controlStateChanged(QLowEnergyController::ControllerState state)
 {
     (void)state;
 
-//    qDebug() << state;
+    //    qDebug() << state;
 
-//    if (state == QLowEnergyController::ConnectedState) {
-//        QLowEnergyConnectionParameters param;
-//        param.setIntervalRange(7.5, 7.5);
-//        param.setSupervisionTimeout(10000);
-//        param.setLatency(0);
-//        mControl->requestConnectionUpdate(param);
-//    }
+    //    if (state == QLowEnergyController::ConnectedState) {
+    //        QLowEnergyConnectionParameters param;
+    //        param.setIntervalRange(7.5, 7.5);
+    //        param.setSupervisionTimeout(10000);
+    //        param.setLatency(0);
+    //        mControl->requestConnectionUpdate(param);
+    //    }
 }
 
 void BleUart::connectionUpdated(const QLowEnergyConnectionParameters &newParameters)

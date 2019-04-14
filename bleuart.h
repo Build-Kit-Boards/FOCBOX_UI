@@ -43,6 +43,8 @@ public:
 signals:
     void dataRx(QByteArray data);
     void scanDone(QVariantMap devs, bool done);
+    void bleError(QString info);
+    void connected();
 
 public slots:
     void writeData(QByteArray data);

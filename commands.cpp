@@ -1,18 +1,14 @@
 /*
     Copyright 2016 - 2017 Benjamin Vedder	benjamin@vedder.se
 
-    
-
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
     the Free Software Foundation, either version 3 of the License, or
     (at your option) any later version.
-
     This program is distributed in the hope that it will be useful,
     but WITHOUT ANY WARRANTY; without even the implied warranty of
     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
     GNU General Public License for more details.
-
     You should have received a copy of the GNU General Public License
     along with this program .  If not, see <http://www.gnu.org/licenses/>.
     */
@@ -217,7 +213,7 @@ void Commands::processPacket(QByteArray data)
 
     case COMM_DETECT_MOTOR_R_L: {
         double r = vb.vbPopFrontDouble32(1e6);
-        double l = vb.vbPopFrontDouble32(1e3);        
+        double l = vb.vbPopFrontDouble32(1e3);
         double r2 = vb.vbPopFrontDouble32(1e6);
         double l2 = vb.vbPopFrontDouble32(1e3);
         emit motorRLReceived(r, l,r2,l2);
@@ -564,7 +560,7 @@ void Commands::measureEncoder(double current)
 {
     VByteArray vb;
     vb.vbAppendInt8(COMM_DETECT_ENCODER);
-    vb.vbAppendDouble16(current, 1e3);
+    vb.vbAppendDouble32(current, 1e3);
     emitData(vb);
 }
 
