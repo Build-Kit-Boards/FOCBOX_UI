@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright 2018 Benjamin Vedder	benjamin@vedder.se
 
 
@@ -123,6 +123,8 @@ Item{
     property double minutesToOff: 10
     property bool pushToStart: true
 
+    property double pwmFreq: 20000
+
     property double motorTemp: 135
     property bool motorTempEnable: true
     property double motorBeta: 4100
@@ -204,11 +206,11 @@ Item{
             return;
         }
         gain2 = 0.001 / (lambda2 * lambda2)*1e6
-        if(lambda >0.0001 && lambda2 > 0.0001){
-            var lambda_min = Math.min(lambda,lambda2)
-            openloop_rpm = Math.round(500.0*0.006/lambda_min/10.0)*10.0
-            sensorless_rpm = Math.round(3500.0*0.006/lambda_min/10.0)*10.0
-        }
+        //        if(lambda >0.0001 && lambda2 > 0.0001){
+        //            var lambda_min = Math.min(lambda,lambda2)
+        //            openloop_rpm = Math.round(500.0*0.006/lambda_min/10.0)*10.0
+        //            sensorless_rpm = Math.round(3500.0*0.006/lambda_min/10.0)*10.0
+        //        }
     }
     function updateDisplay() {
         txtMinTest.text = "Min: " + parseFloat(msMinTest).toFixed(2) + " ms"
@@ -287,6 +289,10 @@ Item{
         
         slider5.value = minutesToOff/60.0
         slider6.value = (secondsToOff - 1.5)*2/17.0
+
+        pwmFreqSlider.value = (pwmFreq - 20000)/10000.0
+        sensorlessRpmSlider.value = (sensorless_rpm - 1500)/4000.0
+        openloopRpmSlider.value = (openloop_rpm - 300)/1000.0
         
         drawTorqueCurve()
     }
@@ -312,6 +318,7 @@ Item{
 
         mMcConf.updateParamDouble("foc_motor_r", res, item1);
         mMcConf.updateParamDouble("foc_motor_r2", res2, item1);
+         mMcConf.updateParamDouble("foc_f_sw", pwmFreq, item1);
 
         mMcConf.updateParamDouble("foc_openloop_rpm", openloop_rpm, item1);
         mMcConf.updateParamDouble("foc_sl_erpm", sensorless_rpm, item1);
@@ -1187,6 +1194,7 @@ Item{
                                         font.pixelSize: labelTxt.font.pixelSize * 0.75
                                     }
                                 }
+
                             }
                         }
                     }
@@ -1920,7 +1928,9 @@ Item{
                                     }
                                 }
                             }
+
                         }
+
 
                     }
                     /* RowLayout {
@@ -2068,6 +2078,18 @@ Item{
                                 item1.maxBrakeCurrent2 = -Math.round(value*item1.maxHWcurrent)
                                 updateGraphics()
                             }
+                        }
+                    }
+                    Button {
+                        id: buttonAdvancedMotorSettings
+                        text: qsTr("ADVANCED CONFIG")
+                        font.pixelSize: uibox.textSize1
+                        Layout.preferredWidth: button.width
+                        //Layout.preferredHeight: 0.6*uibox.middleColumnWidth1
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        //enabled:false
+                        onClicked: {
+                            advancedMotorSettings.open()
                         }
                     }
 
@@ -3201,7 +3223,7 @@ Item{
             useHallSenors1 = (mMcConf.getParamEnum("foc_sensor_mode")===2)
             useHallSenors2 = (mMcConf.getParamEnum("foc_sensor_mode2")===2)
 
-
+            pwmFreq = mMcConf.getParamDouble("foc_f_sw")
             res = mMcConf.getParamDouble("foc_motor_r")
             res2 = mMcConf.getParamDouble("foc_motor_r2")
             ind = mMcConf.getParamDouble("foc_motor_l")
@@ -3228,14 +3250,12 @@ Item{
             openloop_rpm =  mMcConf.getParamDouble("foc_openloop_rpm")
             sensorless_rpm =  mMcConf.getParamDouble("foc_sl_erpm")
 
-
-
-
             calcGain()
             calcGain2()
 
             maxCurrent1 = mMcConf.getParamDouble("l_current_max")
             maxCurrent2 = mMcConf.getParamDouble("l_current_max")
+
 
             maxBrakeCurrent1 = mMcConf.getParamDouble("l_current_min")
             maxBrakeCurrent2 = mMcConf.getParamDouble("l_current_min")
@@ -3939,5 +3959,168 @@ Item{
         }
 
     }
-}
+    Dialog{
+        id: advancedMotorSettings
+        modal: true
+        focus: true
+        width: Math.min(parent.width - 8,parent.height*0.5)
+        closePolicy: Popup.CloseOnEscape
+        title:"ADVANCED MOTOR CONFIG:"
 
+
+        x: (parent.width - width) / 2
+        y: (parent.height - height) / 2
+        ColumnLayout{
+            id:motorDialogBody
+            anchors.fill:parent
+            spacing: 10
+
+            RowLayout{
+                Layout.fillWidth: true
+                spacing: 0
+                Button{
+                    text:"Restore Default Values"
+                   // font.bold: true
+                   // horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                    onPressed: {
+                        pwmFreqSlider.value = 0
+                        sensorlessRpmSlider.value = 0.5
+                        openloopRpmSlider.value = 0.2
+                    }
+                }
+            }
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    text:"PWM Frequency:"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:pwmFreqText
+                    text:"20000 kHz"
+                    //font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: pwmFreqSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0
+                    stepSize: 0.05
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        pwmFreq = value*10000 +20000
+                        pwmFreqText.text = parseFloat(pwmFreq).toFixed(0) + " kHz"
+                    }
+                }
+            }
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    text:"Sensored to Sensorless Transition RPM:"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:sensorlessRpmText
+                    text:"3500 rpm"
+                    //font.bold: true
+                    horizontalAlignment: Text.AlignRight
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: sensorlessRpmSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0.5
+                    stepSize: 0.05
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        sensorless_rpm = value*4000 + 1500
+                        sensorlessRpmText.text = parseFloat(sensorless_rpm).toFixed(0) + " rpm"
+                    }
+                }
+            }
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    text:"Sensorless Openloop RPM:"
+                    font.bold: true
+                    horizontalAlignment: Text.AlignCenter
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.fillWidth: true
+                }
+            }
+
+            RowLayout{
+                Layout.fillWidth: true
+                Text{
+                    id:openloopRpmText
+                    text:"500 rpm"
+                    //font.bold: true
+                    horizontalAlignment: Text.AlignRig4ht
+                    font.pixelSize: uibox.textSize2
+                    // Layout.alignment: Qt.AlignRight
+                    Layout.preferredWidth: parent.width/5
+                }
+
+
+                Slider {
+                    id: openloopRpmSlider
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                    Layout.fillWidth: true
+                    value: 0.2
+                    stepSize: 0.05
+
+                    Layout.preferredHeight: buttonReadCurrent.height*2/3
+                    onValueChanged:  {
+                        openloop_rpm = value*1000 + 300
+                        openloopRpmText.text = parseFloat(openloop_rpm).toFixed(0) + " rpm"
+                    }
+                }
+            }
+
+            RowLayout{
+                Button {
+                    //standardButtons: DialogButtonBox.Ok
+                    Layout.fillWidth: true
+                    text:"OK"
+                    Layout.alignment: Qt.AlignRight
+                    onPressed: {
+                        advancedMotorSettings.close()
+                    }
+                }
+            }
+        }
+    }
+}

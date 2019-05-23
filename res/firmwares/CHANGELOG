@@ -1,3 +1,9 @@
+=== FW 23.44 ===
+* Fixed bug where disabling auto-shutdown also disabled the power switch from powering off
+* Patched bug with abs_over_current_fault being triggered from momentary spikes on ADC lines
+* Added some level of write protection for motor config by requiring that the motor config packet have correct length
+* Added some extra data to fault reporting
+
 === FW 23.43 ===
 * Reverted change to R/L detection to fix some bad motor ID problems
 * Added updates to serial driver and packet format

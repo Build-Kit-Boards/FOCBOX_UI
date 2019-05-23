@@ -51,4 +51,9 @@
 *Added decimal place to the battery voltage reading
 *Labeled axes for torque curves
 
+=== 1.3 ===
+*Support for firmware 23.44, bugfix for cutout issue on certain high-power boards and write protection if an incorrect length motor config is sent from third part app
+*Added some info to HUD page including a tachometer and efficiency estimate
+*Added an advanced motor settings window for tuning pwm freq, sensorless erpm transition for boards with hall sensors, and sensorlesss openloop rpm for unsensored boards
+
 

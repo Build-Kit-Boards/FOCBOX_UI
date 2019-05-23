@@ -89,7 +89,7 @@ Item {
         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
         anchors.centerIn: parent
         //Layout.fillHeight: false
-        //height: 620
+        //height: 6202
         Layout.columnSpan: 1
         //Layout.fillHeight: true
         //Layout.fillWidth: false
@@ -98,8 +98,15 @@ Item {
         // sourceSize.width: 0
         //fillMode: Image.Stretch
         transformOrigin: Item.Center
-        z: 0
+        z: -2
         source: "../res/skate_deck.png"
+        Rectangle{
+            anchors.fill: parent
+            color: "white"
+            opacity: 0.25
+            z:0
+        }
+
         Text {
             id: motorTempText
             anchors.centerIn:  parent
@@ -125,8 +132,8 @@ Item {
             spacing: 0.015*imageBoard.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: 0.325*imageBoard.width
-            anchors.horizontalCenterOffset: -0.32*imageBoard.width
+            anchors.verticalCenterOffset: 0.332*imageBoard.width
+            anchors.horizontalCenterOffset: -0.327*imageBoard.width
             width: 0.31*imageBoard.width
 
             RowLayout{
@@ -136,12 +143,11 @@ Item {
                 Rectangle {
                     // anchors.centerIn:parent
                     //anchors.verticalCenterOffset : 0.075*imageBoard.width
-                    Layout.preferredHeight: 0.11*imageBoard.width
+                    Layout.preferredHeight: 0.12*imageBoard.width
                     // Layout.preferredWidth: 0.315*imageBoard.width
 
                     id: currentGauge
                     color: "#00000000"
-                    property real actualVal: 0
                     property string positive: "#00CCA3"
                     property string negative: "orange"
                     z: 1
@@ -151,13 +157,13 @@ Item {
                         radius:daddy.fillet
                         anchors.right: parent.right
                         height: currentGauge.height
-                        width: currentGauge.width*currentGauge.value/currentGauge.maximumValue
-                        color:  (currentGauge.actualVal >= 0) ? currentGauge.positive : currentGauge.negative
+                        width: currentGauge.width*Math.abs(currentGauge.value)/currentGauge.maximumValue
+                        color:  (currentGauge.value >= 0) ? currentGauge.positive : currentGauge.negative
                     }
                     Text {
                         anchors.centerIn: parent
                         id: currentText
-                        text: qsTr("0 A")
+                        text: parseFloat(currentGauge.value).toFixed(0) + " A"
                         z: 3
                         transformOrigin: Item.Top
                         horizontalAlignment: Text.AlignHCenter
@@ -175,6 +181,7 @@ Item {
 
 
 
+
                     Behavior on value {
                         NumberAnimation {
                             easing.type: Easing.OutCirc
@@ -189,7 +196,6 @@ Item {
                 Rectangle {
                     // anchors.centerIn:parent
                     id: voltageGauge
-                    property real actualVal: 0
                     color: "#00000000"
                     property string positive: "#00CCA3"
                     property string negative: "orange"
@@ -199,13 +205,13 @@ Item {
                         radius:daddy.fillet
                         anchors.right: parent.right
                         height:parent.height
-                        width: voltageGauge.width*voltageGauge.value/voltageGauge.maximumValue
-                        color:  (voltageGauge.actualVal >= 0) ? voltageGauge.positive : voltageGauge.negative
+                        width: voltageGauge.width*Math.abs(voltageGauge.value)/voltageGauge.maximumValue
+                        color:  (voltageGauge.value >= 0) ? voltageGauge.positive : voltageGauge.negative
                     }
                     Text {
                         anchors.centerIn: voltageGauge
                         id: powerText
-                        text: qsTr("0 V")
+                        text: parseFloat(voltageGauge.value).toFixed(0) + " V"
                         z: 4
                         transformOrigin: Item.Top
                         horizontalAlignment: Text.AlignHCenter
@@ -234,8 +240,8 @@ Item {
             spacing: 0.015*imageBoard.width
             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
             anchors.centerIn: parent
-            anchors.verticalCenterOffset: 0.325*imageBoard.width
-            anchors.horizontalCenterOffset: 0.32*imageBoard.width
+            anchors.verticalCenterOffset: 0.333*imageBoard.width
+            anchors.horizontalCenterOffset: 0.327*imageBoard.width
             width: 0.31*imageBoard.width
 
             RowLayout{
@@ -250,7 +256,6 @@ Item {
 
                     id: currentGauge2
                     color: "#00000000"
-                    property real actualVal: 0
                     property string positive: "#00CCA3"
                     property string negative: "orange"
                     z: 1
@@ -260,13 +265,13 @@ Item {
                         radius: daddy.fillet
                         anchors.left: parent.left
                         height: currentGauge2.height
-                        width: currentGauge2.width*currentGauge2.value/currentGauge2.maximumValue
-                        color:  (currentGauge2.actualVal >= 0) ? currentGauge2.positive : currentGauge2.negative
+                        width: currentGauge2.width*Math.abs(currentGauge2.value)/currentGauge2.maximumValue
+                        color:  (currentGauge2.value >= 0) ? currentGauge2.positive : currentGauge2.negative
                     }
                     Text {
                         anchors.centerIn: parent
                         id: currentText2
-                        text: qsTr("0 A")
+                        text: parseFloat(currentGauge2.value).toFixed(1) + " A"
                         z: 3
                         transformOrigin: Item.Top
                         horizontalAlignment: Text.AlignHCenter
@@ -307,13 +312,13 @@ Item {
                         radius: daddy.fillet
                         anchors.left: parent.left
                         height:parent.height
-                        width: voltageGauge2.width*voltageGauge2.value/voltageGauge2.maximumValue
-                        color:  (voltageGauge2.actualVal >= 0) ? voltageGauge2.positive : voltageGauge2.negative
+                        width: voltageGauge2.width*Math.abs(voltageGauge2.value)/voltageGauge2.maximumValue
+                        color:  (voltageGauge2.value >= 0) ? voltageGauge2.positive : voltageGauge2.negative
                     }
                     Text {
                         anchors.centerIn: voltageGauge2
                         id: powerText2
-                        text: qsTr("0 V")
+                        text: parseFloat(voltageGauge2.value).toFixed(0) + " V"
                         z: 4
                         transformOrigin: Item.Top
                         horizontalAlignment: Text.AlignHCenter
@@ -344,7 +349,7 @@ Item {
             anchors.centerIn: parent
             Layout.preferredWidth: 0.4*imageBoard.width
             Layout.preferredHeight:  0.6*imageBoard.width
-            anchors.verticalCenterOffset: -0.2*imageBoard.width
+            anchors.verticalCenterOffset: -0.135*imageBoard.width
             spacing: 10
 
             RowLayout{
@@ -374,6 +379,9 @@ Item {
                     property real minimumValue: 0
                     property real maximumValue: 100
                     property real value: 100
+                    property real current: 0
+                    property real currentMinimumValue: -40
+                    property real currentMaximumValue: 60
                     z: 2
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     Rectangle{
@@ -383,6 +391,29 @@ Item {
                         color:  (batteryGauge.value >= 20) ? batteryGauge.full : batteryGauge.low
                         radius: 0.0075*imageBoard.width
                         z: -1
+                    }
+
+                    Rectangle{
+                        anchors.centerIn: parent
+                        anchors.horizontalCenterOffset: -parent.width/2 + width/2
+                        anchors.verticalCenterOffset: -parent.height/2 - 3*height/4
+                        height:parent.height*0.8
+                        width: batteryGauge.width*Math.abs(batteryGauge.current)/batteryGauge.currentMaximumValue
+                        color:  (batteryGauge.current <= 0) ? currentGauge.negative : currentGauge.positive
+                        radius: 0.0025*imageBoard.width
+                        z: -1
+                    }
+                    Text {
+                        anchors.centerIn: parent
+                        anchors.verticalCenterOffset: -parent.height/2 - 2*height/3
+                        id: batteryCurrentText
+                        text: parseFloat(batteryGauge.current).toFixed(0) + " A"
+                        z: 4
+                        transformOrigin: Item.Top
+                        horizontalAlignment: Text.AlignHCenter
+                        font.pixelSize: 0.075*imageBoard.width
+                        Layout.alignment: Qt.AlignHCenter | Qt.AlignTop
+                        Layout.fillWidth: true
                     }
 
 
@@ -400,7 +431,7 @@ Item {
                     antialiasing: false
                     Layout.fillHeight: false
                     Layout.preferredWidth: 0.3*imageBoard.width
-                    Layout.preferredHeight: 0.11*imageBoard.width
+                    Layout.preferredHeight: 0.1*imageBoard.width
                     Behavior on value {
                         NumberAnimation {
                             easing.type: Easing.OutCirc
@@ -417,8 +448,8 @@ Item {
                 CircularGauge {
                     id: rpmGauge
                     z: 2
-                    Layout.preferredWidth: 0.4*imageBoard.width
-                    Layout.preferredHeight: 0.4*imageBoard.width
+                    Layout.preferredWidth: 0.35*imageBoard.width
+                    Layout.preferredHeight: 0.35*imageBoard.width
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                     minimumValue: 0
 
@@ -448,14 +479,25 @@ Item {
                         text: qsTr("0 MPH")
                         anchors.centerIn: parent
                         anchors.verticalCenterOffset: 0.06*imageBoard.width
-                        font.pixelSize: 0.075*imageBoard.width
+                        font.pixelSize: 0.065*imageBoard.width
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                         Layout.fillWidth: true
                         Text {
+                            id: odomText
+                            anchors.centerIn:  parent
+                            anchors.verticalCenterOffset: parent.height*2.25
+                            //anchors.horizontalCenterOffset: -parent.height*0.8
+                            font.pixelSize: 0.04*imageBoard.width
+                            horizontalAlignment: Text.AlignHCenter
+                            text: qsTr("0.00 Wh/km\r\n0.0 km")
+                            //Layout.fillWidth: true
+                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+                        }
+                        Text {
                             id: tempText
                             anchors.centerIn:  parent
-                            anchors.verticalCenterOffset: parent.height
-                            anchors.horizontalCenterOffset: -parent.height*0.8
+                            anchors.verticalCenterOffset: 9/10*parent.height
+                            anchors.horizontalCenterOffset: -parent.height
                             font.pixelSize: 0.04*imageBoard.width
                             text: qsTr("0 \u00B0C")
                             //Layout.fillWidth: true
@@ -464,7 +506,7 @@ Item {
                         Text {
                             id: tempText2
                             anchors.centerIn:  parent
-                            anchors.verticalCenterOffset: parent.height
+                            anchors.verticalCenterOffset: 9/10*parent.height
                             anchors.horizontalCenterOffset: parent.height*1.2
                             font.pixelSize: 0.04*imageBoard.width
                             text: qsTr("0 \u00B0C")
@@ -513,20 +555,14 @@ Item {
 
         onValuesReceived: {
 
-            currentGauge.actualVal = values.current_motor
-            currentGauge.value = Math.abs(values.current_motor)
-            currentGauge2.value = Math.abs(values.current_motor2)
-            currentGauge2.actualVal = values.current_motor2
-            currentText.text = parseFloat(values.current_motor).toFixed(0) + " A"
-            currentText2.text = parseFloat(values.current_motor2).toFixed(0) + " A"
-            voltageGauge.value = Math.abs(values.duty_now * values.v_in)
-            voltageGauge2.value = Math.abs(values.duty_now2 * values.v_in)
-            voltageGauge.actualVal = values.duty_now * values.v_in
-            voltageGauge2.actualVal = values.duty_now2 * values.v_in
+            currentGauge.value = values.current_motor
+            currentGauge2.value = values.current_motor2
+            voltageGauge.value = values.duty_now * values.v_in
+            voltageGauge2.value = values.duty_now2 * values.v_in
             voltageGauge.maximumValue = values.v_in
             voltageGauge2.maximumValue = voltageGauge.maximumValue
-            powerText.text = parseFloat(values.duty_now * values.v_in).toFixed(0) + " V"
-            powerText2.text = parseFloat(values.duty_now2 * values.v_in).toFixed(0) + " V"
+            batteryGauge.currentMaximumValue = mMcConf.getParamDouble("l_in_current_max")
+            batteryGauge.currentMinimumValue = mMcConf.getParamDouble("l_in_current_min")
             var v_min = mMcConf.getParamDouble("l_battery_cut_end")
             var v_max = v_min*4.2/3.1
             var battValue
@@ -540,6 +576,7 @@ Item {
             if(battValue<0)
                 battValue = 0
             batteryGauge.value = battValue
+            batteryGauge.current = values.current_in
             var fl = mMcConf.getParamDouble("foc_motor_flux_linkage")
             var rpmMax = (values.v_in * 60.0) / (Math.sqrt(3.0) * 2.0 * Math.PI * fl)
             var rpmMaxRound = (Math.ceil(rpmMax / 5000.0) * 5000.0) / 1000.0
@@ -554,10 +591,20 @@ Item {
                 batteryText.text = parseFloat(values.v_in).toFixed(1) + " V"
 
             if(speedSwitch.checked){
+                var miles = Math.max(values.tachometer,values.tachometer2)/6.0/rpmconv.realValue*mmDiameter.value/1000.0*3.14*0.000621371
+                var milage = 0
+                if(Math.abs(miles) > 0.01)
+                    milage = (values.watt_hours - values.watt_hours_charged)/miles
+                odomText.text = parseFloat(milage).toFixed(1) + " Wh/mi\r\n" + parseFloat(miles).toFixed(2) + " mi"
                 rpmGauge.value = Math.min(values.rpm,values.rpm2)/rpmconv.realValue*60*mmDiameter.value/1000.0*3.14*0.000621371 //to mph
                 rpmGauge.maximumValue = 35
                 rpmText.text = parseFloat(Math.round(rpmGauge.value,1)) + " MPH"
             }else{
+                var km = Math.max(values.tachometer,values.tachometer2)/6.0/rpmconv.realValue*mmDiameter.value/1000.0*3.14*0.000621371*1.609
+                var kmage = 0;
+                if(Math.abs(km) > 0.01)
+                     kmage = (values.watt_hours - values.watt_hours_charged)/km
+                odomText.text = parseFloat(kmage).toFixed(1) + " Wh/km\r\n" + parseFloat(km).toFixed(2) + " km"
                 rpmGauge.value = Math.min(values.rpm,values.rpm2)/rpmconv.realValue*60*mmDiameter.value/1000.0*3.14*0.000621371*1.609//to kph
                 rpmText.text = parseFloat(Math.round(rpmGauge.value,1)) + " KM/H"
                 rpmGauge.maximumValue = 55
@@ -795,7 +842,7 @@ Item {
             property alias  mphOrKmh: batterySwitch.checked
             property alias  vOrPercent: speedSwitch.checked
             property alias  erpmToRpm: rpmconv.value
-            property alias  wheelDiamter: mmDiameter.value
-        }
+        property alias  wheelDiamter: mmDiameter.value
+    }
 
 }

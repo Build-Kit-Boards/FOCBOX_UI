@@ -5,7 +5,7 @@
 #-------------------------------------------------
 
 # Version
-VT_VERSION = 1.2
+VT_VERSION = 1.3
 VT_INTRO_VERSION = 1
 
 DEFINES += VT_VERSION=$$VT_VERSION
@@ -28,7 +28,7 @@ CONFIG += c++11
 DEFINES += HAS_BLUETOOTH
 
 # Build mobile GUI
-# CONFIG += build_mobile
+#CONFIG += build_mobile
 
 CONFIG += qtquickcompiler
 
