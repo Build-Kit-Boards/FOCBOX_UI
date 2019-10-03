@@ -648,7 +648,7 @@ void Commands::firmwareUploadUpdate(bool isTimeout)
         return;
     }
 
-    const int app_packet_size = 100;
+    const int app_packet_size = 400;
     const int retries = 5;
     const int timeout = 500;
 

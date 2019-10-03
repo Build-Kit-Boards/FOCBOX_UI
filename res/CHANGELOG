@@ -56,4 +56,6 @@
 *Added some info to HUD page including a tachometer and efficiency estimate
 *Added an advanced motor settings window for tuning pwm freq, sensorless erpm transition for boards with hall sensors, and sensorlesss openloop rpm for unsensored boards
 
-
+=== 1.4 ===
+*Support for firmware 23.45, fix BLE cutouts, fix to battery current mapping
+*Bugfix for cutom battery voltages being displayed on read correctly

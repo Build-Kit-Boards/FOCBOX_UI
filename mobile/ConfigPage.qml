@@ -3263,9 +3263,16 @@ Item{
 
             battMaxCutoff = mMcConf.getParamDouble("l_battery_cut_start")
             battMinCutoff = mMcConf.getParamDouble("l_battery_cut_end")
+            var isEven = battMaxCutoff/3.4
 
             var cellNum = Math.round(battMaxCutoff/3.4)
-            seriesCells.currentIndex = (cellNum - 3)
+            var remainderMax = Math.abs(battMaxCutoff/3.4 - cellNum)
+            var remainderMin = Math.abs(battMinCutoff/3.1 - Math.round(battMinCutoff/3.1))
+            if(remainderMax == 0 && remainderMin == 0){
+               seriesCells.currentIndex = (cellNum - 3)
+            }else{
+                seriesCells.currentIndex = 10
+            }
 
 
             battCharge = mMcConf.getParamDouble("l_in_current_min")
