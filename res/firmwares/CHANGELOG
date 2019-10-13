@@ -1,7 +1,10 @@
-=== FW 23.44 ===
+=== FW 23.46 ===
+* Reverted change to bluetooth
+* Adjusted strategy for alternating both motors during control
+
+=== FW 23.45 ===
 * Fixed bug with bluetooth
 * Fixed bug that caused battery current limit to be per motor and not total
-* 
 
 === FW 23.44 ===
 * Fixed bug where disabling auto-shutdown also disabled the power switch from powering off
@@ -17,11 +20,11 @@
 
 === FW 23.42 ===
 * Adjusted default motor thermal settings to improve performance of raptor 2.1
-* Sight alteration to low-speed braking algorithm for smoother braking. May notice a subtle chatter sound at low speed braking which is normal and safe. 
+* Sight alteration to low-speed braking algorithm for smoother braking. May notice a subtle chatter sound at low speed braking which is normal and safe.
 
 === FW 23.41 ===
 * Phase shifted each motor to alternate peak loading
-* Improved voltage line filtering 
+* Improved voltage line filtering
 * Created proper repository finally (versioning will now be more clear)
 
 === FW 23.40 ===
@@ -31,7 +34,7 @@
 * Added changes to support smart switch, more config settings in app settings
 
 === FW 23.38 ===
-* Improved FOC code for legibility 
+* Improved FOC code for legibility
 
 === FW 23.37 ===
 * Added more settings to motor temperature config
@@ -228,4 +231,3 @@
 * Hardware specific default configuration support.
 * Stop functionality for apps so that reboots are not required anymore when changing app.
 * EEPROM emulation bug fix: https://github.com/vedderb/bldc/issues/27
-

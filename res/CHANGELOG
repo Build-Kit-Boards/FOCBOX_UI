@@ -59,3 +59,7 @@
 === 1.4 ===
 *Support for firmware 23.45, fix BLE cutouts, fix to battery current mapping
 *Bugfix for cutom battery voltages being displayed on read correctly
+
+
+=== 1.5 ===
+*Support for firmware 23.46, revert BLE change to patch dangerous bug causing compatibility issue with logging data via metr.

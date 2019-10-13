@@ -18,6 +18,7 @@ p, li { white-space: pre-wrap; }
             <enumNames>23.43</enumNames>
             <enumNames>23.44</enumNames>
             <enumNames>23.45</enumNames>
+            <enumNames>23.46</enumNames>
         </fw_version>
         <help_battery_cutoff>
             <longName>Soft Battery Cutoff Calculator</longName>
