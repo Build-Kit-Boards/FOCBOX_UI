@@ -27,6 +27,7 @@
 #include <QDebug>
 #include <QNetworkReply>
 #include <QMessageBox>
+#include <QFile>
 
 #ifdef Q_OS_ANDROID
 #include <QtAndroid>
@@ -113,7 +114,7 @@ bool Utility::autoconnectBlockingWithProgress(VescInterface *vesc, QWidget *pare
     if (!res) {
         vesc->emitMessageDialog(QObject::tr("Autoconnect"),
                                 QObject::tr("Could not autoconnect. Make sure that the USB cable is plugged in "
-                                            "and that the FOCBOX is powered."),
+                                            "and that the Xenith is powered."),
                                 false);
     }
 
@@ -180,10 +181,11 @@ QString Utility::vescToolChangeLog()
 
 QString Utility::aboutText()
 {
-    return tr("<b>FOCBOX® UI %1.1</b><br>"
+    return tr("<b>Xenith Easy UI %1.1</b><br>"
+              "<a href=\"https://buildkitboards.com/\">https://buildkitboards.com/</a> <br><br>"
+              "This application was origionally developed by:<br>"
               "Jeffrey Friesen 2018<br>"
-              "<a href=\"mailto:Jeff@enertionboards.com\">Jeff@enertionboards.com</a><br>"
-              "<a href=\"https://enertionboards.com/\">https://enertionboards.com/</a> <br><br>"
+              "<br><br>"
               "This Application is based on the VESC®-Tool<br>"
               "&copy; Benjamin Vedder 2016-2018<br>"
               "<a href=\"mailto:benjamin@vedder.se\">benjamin@vedder.se</a><br>"

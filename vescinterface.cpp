@@ -392,7 +392,7 @@ bool VescInterface::connectSerial(QString port, int baudrate)
     (void)baudrate;
     emit messageDialog(tr("Connect serial"),
                        tr("Serial port support is not enabled in this build "
-                          "of FOCBOX UI."),
+                          "of Xenith Easy UI."),
                        false, false);
     return false;
 #endif
@@ -412,7 +412,7 @@ QList<VSerialInfo_t> VescInterface::listSerialPorts()
         int index = res.size();
 
         if(port.manufacturer().startsWith("STMicroelectronics")) {
-            info.name.insert(0, "UNITY - ");
+            info.name.insert(0, "XENITH - ");
             info.isVesc = true;
             index = 0;
         } else {
@@ -559,7 +559,7 @@ void VescInterface::timerSlot()
                     emit statusMessage(tr("No firmware read response"), false);
                     emit messageDialog(tr("Read Firmware Version"),
                                        tr("Could not read firmware version. Make sure "
-                                          "that selected port really belongs to the FOCBOX. "),
+                                          "that selected port really belongs to the Xenith. "),
                                        false, false);
                     disconnectPort();
                 }
@@ -633,7 +633,7 @@ void VescInterface::fwVersionReceived(int major, int minor, QString hw, QByteArr
 
     if (fwPairs.isEmpty()) {
         emit messageDialog(tr("No Supported Firmwares"),
-                           tr("This version of FOCBOX UI does not seem to have any supported "
+                           tr("This version of Xenith Easy UI does not seem to have any supported "
                               "firmwares. Something is probably wrong with the motor configuration "
                               "file."),
                            false, false);
@@ -653,16 +653,16 @@ void VescInterface::fwVersionReceived(int major, int minor, QString hw, QByteArr
         updateFwRx(false);
         mFwRetries = 0;
         disconnectPort();
-        emit messageDialog(tr("Error"), tr("The firmware on the connected FOCBOX is too old. Please"
+        emit messageDialog(tr("Error"), tr("The firmware on the connected Xenith is too old. Please"
                                            " update it using a programmer."), false, false);
     } else if (fw_connected > highest_supported) {
         mCommands->setLimitedMode(true);
         updateFwRx(true);
         if (!wasReceived) {
-            emit messageDialog(tr("Warning"), tr("The connected FOCBOX has newer firmware than this version of"
-                                                " FOCBOX UI supports. It is recommended that you update FOCBOX"
+            emit messageDialog(tr("Warning"), tr("The connected Xenith has newer firmware than this version of"
+                                                " Xenith Easy UI supports. It is recommended that you update Xenith"
                                                 " UI to the latest version. Alternatively, the firmware on"
-                                                " the connected FOCBOX can be downgraded in the firmware page."
+                                                " the connected Xenith can be downgraded in the firmware page."
                                                 " Until then, limited communication mode will be used where"
                                                 " only the firmware can be changed."), false, false);
         }
@@ -671,7 +671,7 @@ void VescInterface::fwVersionReceived(int major, int minor, QString hw, QByteArr
             mCommands->setLimitedMode(true);
             updateFwRx(true);
             if (!wasReceived) {
-                emit messageDialog(tr("Warning"), tr("The connected FOCBOX has too old firmware. It can be"
+                emit messageDialog(tr("Warning"), tr("The connected Xenith has too old firmware. It can be"
                                                     " updated from the Firmware page."
                                                     " Until then, limited communication mode will be used where only the"
                                                     " firmware can be changed."), false, false);
@@ -681,7 +681,7 @@ void VescInterface::fwVersionReceived(int major, int minor, QString hw, QByteArr
             mFwRetries = 0;
             disconnectPort();
             if (!wasReceived) {
-                emit messageDialog(tr("Error"), tr("The firmware on the connected FOCBOX is too old. Please"
+                emit messageDialog(tr("Error"), tr("The firmware on the connected Xenith is too old. Please"
                                                    " update it using a programmer."), false, false);
             }
         }
@@ -689,13 +689,13 @@ void VescInterface::fwVersionReceived(int major, int minor, QString hw, QByteArr
         updateFwRx(true);
         if (fw_connected < highest_supported) {
             if (!wasReceived) {
-                emit messageDialog(tr("Warning"), tr("The connected FOCBOX has compatible, but old"
+                emit messageDialog(tr("Warning"), tr("The connected Xenith has compatible, but old"
                                                     " firmware. To update, navigate to the firmware tab and click upload on the default page. Remember you will need to re-run Guided Setup after the firmware update."), false, false);
             }
         }
 
         QString fwStr;
-        fwStr.sprintf("FOCBOX Firmware Version %d.%d", major, minor);
+        fwStr.sprintf("Xenith Firmware Version %d.%d", major, minor);
         if (!hw.isEmpty()) {
             fwStr += ", Hardware: " + hw;
         }

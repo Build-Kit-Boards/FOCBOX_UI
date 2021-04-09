@@ -130,18 +130,19 @@
         <file>res/fonts/DejaVuSans-Bold.ttf</file>
         <file>res/icons/ic_folder_open_black_48dp.png</file>
         <file>res/icons/ic_insert_drive_file_black_48dp.png</file>
-        <file>res/logo_new.png</file>
-        <file>res/logo_enertion.png</file>
-        <file>res/skate_deck.png</file>
         <file>res/flux linkage.png</file>
         <file>res/inductor.png</file>
         <file>res/resistor.png</file>
         <file>res/spinIcon.png</file>
-        <file>res/bootloaders/UNITY.bin</file>
+        <file>res/bootloaders/XENITH.bin</file>
         <file>res/success.png</file>
         <file>res/icons/arrow_down.svg</file>
         <file>res/icons/arrow_down2.png</file>
-        <file>res/firmwares/UNITY/UNITY.bin</file>
+        <file>res/firmwares/UNITY/XENITH.bin</file>
         <file>res/images/pinout.png</file>
+        <file>res/xenith_mainpage</file>
+        <file>res/bkb_logo_side.png</file>
+        <file>res/easy_ui_icon6-01.png</file>
+        <file>res/skate_deck3-01.png</file>
     </qresource>
 </RCC>

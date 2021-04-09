@@ -28,7 +28,7 @@ CONFIG += c++11
 DEFINES += HAS_BLUETOOTH
 
 # Build mobile GUI
-#CONFIG += build_mobile
+CONFIG += build_mobile
 
 CONFIG += qtquickcompiler
 
@@ -171,8 +171,11 @@ build_original {
 
 DISTFILES += \
     android/AndroidManifest.xml \
+    android/AndroidManifest_copy.xml \
+    android/gradle.properties \
     android/gradle/wrapper/gradle-wrapper.jar \
     android/gradlew \
+    android/gradlew.bat \
     android/res/values/libs.xml \
     android/build.gradle \
     android/gradle/wrapper/gradle-wrapper.properties \

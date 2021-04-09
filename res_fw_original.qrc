@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>res/firmwares/UNITY/UNITY.bin</file>
+        <file>res/firmwares/UNITY/XENITH.bin</file>
     </qresource>
 </RCC>

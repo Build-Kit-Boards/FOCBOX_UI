@@ -712,7 +712,7 @@ void MainWindow::on_actionExit_triggered()
 
 void MainWindow::on_actionAbout_triggered()
 {
-    QMessageBox::about(this, "FOCBOX Tool", Utility::aboutText());
+    QMessageBox::about(this, "Xenith Easy UI", Utility::aboutText());
 }
 
 void MainWindow::on_actionLibrariesUsed_triggered()

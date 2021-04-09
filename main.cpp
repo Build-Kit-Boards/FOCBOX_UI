@@ -114,7 +114,7 @@ int main(int argc, char *argv[])
     QFontDatabase::addApplicationFont("://res/fonts/DejaVuSansMono-Oblique.ttf");
 
     qApp->setFont(QFont("DejaVu Sans", 11));
-    qApp->setWindowIcon(QIcon(":/res/icon.png"));
+    qApp->setWindowIcon(QIcon("://res/easy_ui_icon6-01.png"));
     // Style
     a.setStyleSheet("Fusion");
     a.setStyle(QStyleFactory::create("Fusion"));
